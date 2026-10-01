@@ -11,11 +11,11 @@ def load(path):
 
 def eval_rule(ts,mid,spread,lookback,horizon_ms,threshold):
  n=len(mid); cut=int(n*.7); entry=[]; ret=[]
- for i in range(lookback,cut):
+ med_spread=np.median(spread[:cut])\n for i in range(lookback,cut):
   j=np.searchsorted(ts,ts[i]+horizon_ms,side="left")
   if j>=n: break
   momentum=mid[i]/mid[i-lookback]-1
-  if momentum>threshold and spread[i] <= np.median(spread[:cut])*2:
+  if momentum>threshold and spread[i] <= med_spread*2:
    entry.append(i); ret.append((mid[j]-mid[i]-spread[i])/mid[i])
  r=np.array(ret)
  if len(r)==0:return (0,float("nan"),float("nan"))
