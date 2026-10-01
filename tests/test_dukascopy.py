@@ -1,0 +1,1 @@
+import lzma\nimport struct\nfrom perbot222.dukascopy import decode_bi5\n\ndef test_decode_bi5():\n    raw = struct.pack(">IIIff", 123, 2000123, 2000000, 1.0, 1.2)\n    ticks = decode_bi5(lzma.compress(raw), 1_000_000_000)\n    assert len(ticks) == 1\n    assert ticks[0].bid == 2000.0\n    assert ticks[0].ask == 2000.123\n    assert ticks[0].volume > 0
