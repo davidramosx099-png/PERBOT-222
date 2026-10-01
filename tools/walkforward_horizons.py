@@ -8,10 +8,11 @@ MIN_ROWS=100_000
 COOLDOWN_MS=60_000
 
 def load(p):
-    with Path(p).open(newline="",encoding="utf-8") as f:r=list(csv.DictReader(f))
-    return (np.array([int(x["timestamp"]) for x in r],dtype=np.int64),
-            np.array([float(x["bidPrice"]) for x in r]),
-            np.array([float(x["askPrice"]) for x in r]))
+    with Path(p).open(newline="",encoding="utf-8") as f:
+        rd=csv.DictReader(f); rows=[]
+        for x in rd: rows.append((int(x["timestamp"]),float(x["bidPrice"]),float(x["askPrice"])))
+    a=np.asarray(rows,dtype=float)
+    return a[:,0].astype(np.int64),a[:,1],a[:,2]
 
 def feat(bid,ask):
     d=np.diff((bid+ask)/2)
