@@ -26,18 +26,19 @@ def features(ts,bid,ask):
 
 def evaluate(ts,bid,ask,pressure,activity,p_q,a_q):
     vals=[]
-    last_entry=-10**30
+    last_entry=None
     for k in range(len(pressure)):
         i=k+LB
         if activity[k] < a_q or pressure[k] > p_q:
             continue
-        if ts[i]-last_entry < COOLDOWN_MS:
+        current_ts=int(ts[i])
+        if last_entry is not None and current_ts-last_entry < COOLDOWN_MS:
             continue
         j=np.searchsorted(ts,ts[i]+H)
         if j>=len(ts):
             continue
         vals.append((bid[j]-ask[i])/ask[i]*1e4)
-        last_entry=ts[i]
+        last_entry=current_ts
     return np.array(vals,dtype=float)
 
 def main():
