@@ -13,7 +13,7 @@ def load(path):
 def main():
     ts,bid,ask=load("data/xau_test/xauusd-tick-2026-09-29-2026-09-30.csv")
     cut=int(len(ts)*.7)
-    print("TRAIN 70%; quote-aware BUY return; signed pressure + acceleration")
+    spread_med=np.median(ask[:cut]-bid[:cut])\n print("TRAIN 70%; quote-aware BUY return; signed pressure + acceleration")
     for lb in (50,100,250,500,1000,2000):
         d=np.diff((bid+ask)/2)
         s=np.sign(d)
@@ -26,7 +26,7 @@ def main():
                 i=k+lb
                 if i>=cut or i<half: continue
                 f=fast[i-half]
-                if x<=0.10 or f<=x or (ask[i]-bid[i])>2*np.median(ask[:cut]-bid[:cut]):
+                if x<=0.10 or f<=x or (ask[i]-bid[i])>2*spread_med:
                     continue
                 j=np.searchsorted(ts,ts[i]+h)
                 if j<len(ts):
