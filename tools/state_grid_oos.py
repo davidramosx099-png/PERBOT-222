@@ -23,7 +23,7 @@ def feat(ts,bid,ask,lb):
     r=np.convolve(d,np.ones(lb),mode="valid")/mid[lb-1:]*1e4
     return mid,p,a,r
 
-def run(ts,bid,ask,mid,p,a,r,h,cut,p_lo,p_hi,a_lo,a_hi,r_lo,r_hi):
+def run(ts,bid,ask,mid,p,a,r,h,cut,p_lo,a_hi,r_lo):
     gross=[];quote=[];last=None
     for k in range(len(p)):
         # Pre-registered state: strong negative pressure + high activity,
@@ -60,7 +60,7 @@ def main():
                 r_lo=float(np.quantile(np.concatenate(tr),.20))
                 ts,bid,ask=fs[oi][1:]
                 mid,p,a,r=feat(ts,bid,ask,lb)
-                g,q=run(ts,bid,ask,mid,p,a,r,h,lb,p_lo,p_lo,a_hi,a_hi,r_lo,r_hi)
+                g,q=run(ts,bid,ask,mid,p,a,r,h,lb,p_lo,a_hi,r_lo)
                 if len(g):gross.extend(g);quote.extend(q)
             if gross:
                 g=np.asarray(gross);q=np.asarray(quote)
