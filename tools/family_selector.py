@@ -68,12 +68,12 @@ def main():
                     for act in ("high","low","all"):
                         mode=(lb,mode_name,act)
                         fitv=[]; valv=[]
+                        aa=[]; pp=[]
+                        for _,ts,bid,ask in fit:
+                            p,a=feat(ts,bid,ask,lb); pp.append(p); aa.append(a)
+                        aq=float(np.quantile(np.concatenate(aa),.80))
+                        pq=float(np.quantile(np.concatenate(pp),.20)) if mode_name=="contrarian" else float(np.quantile(np.concatenate(pp),.80))
                         for group,out in ((fit,fitv),(val,valv)):
-                            aa=[]; pp=[]
-                            for _,ts,bid,ask in group:
-                                p,a=feat(ts,bid,ask,lb); pp.append(p); aa.append(a)
-                            aq=float(np.quantile(np.concatenate(aa),.80))
-                            pq=float(np.quantile(np.concatenate(pp),.20)) if mode_name=="contrarian" else float(np.quantile(np.concatenate(pp),.80))
                             for item in group:
                                 ts,bid,ask=item[1:]
                                 p,a=feat(ts,bid,ask,lb)
