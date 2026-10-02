@@ -55,49 +55,50 @@ def main():
         x=load(f)
         if len(x[0])>=MIN_ROWS: files.append((f,*x))
     print("VALID_DAYS",len(files))
+    cache={}
+    for di,item in enumerate(files):
+        cache[di]={}
+        ts,bid,ask=item[1:]
+        for lb in LOOKBACKS:
+            p,a=feat(ts,bid,ask,lb)
+            cache[di][lb]=(p,a)
     results=[]
     for oi in range(4,len(files)):
-        # prior days: 60% fitting, 40% internal validation
         prior=files[:oi]
         split=max(2,int(len(prior)*0.6))
-        fit=prior[:split]; val=prior[split:]
+        fit_idx=list(range(split)); val_idx=list(range(split,oi))
         candidates=[]
         for lb in LOOKBACKS:
+            fit_arrays=[cache[d][lb] for d in fit_idx]
+            pp=[x[0] for x in fit_arrays]; aa=[x[1] for x in fit_arrays]
+            aq=float(np.quantile(np.concatenate(aa),.80))
             for h in HORIZONS:
                 for mode_name in ("contrarian","momentum","neutral"):
+                    pq=float(np.quantile(np.concatenate(pp),.20)) if mode_name=="contrarian" else float(np.quantile(np.concatenate(pp),.80))
                     for act in ("high","low","all"):
                         mode=(lb,mode_name,act)
-                        fitv=[]; valv=[]
-                        aa=[]; pp=[]
-                        for _,ts,bid,ask in fit:
-                            p,a=feat(ts,bid,ask,lb); pp.append(p); aa.append(a)
-                        aq=float(np.quantile(np.concatenate(aa),.80))
-                        pq=float(np.quantile(np.concatenate(pp),.20)) if mode_name=="contrarian" else float(np.quantile(np.concatenate(pp),.80))
-                        for group,out in ((fit,fitv),(val,valv)):
-                            for item in group:
-                                ts,bid,ask=item[1:]
-                                p,a=feat(ts,bid,ask,lb)
-                                m=(lb,mode_name,act)
-                                v,n=score(ts,bid,ask,p,a,pq,aq,h,m)
-                                if np.isfinite(v): out.extend([v]*n)
+                        valv=[]
+                        for d in val_idx:
+                            item=files[d]; ts,bid,ask=item[1:]
+                            p,a=cache[d][lb]
+                            v,n=score(ts,bid,ask,p,a,pq,aq,h,mode)
+                            if np.isfinite(v): valv.extend([v]*n)
                         if valv:
                             candidates.append((float(np.mean(valv)),mode,h,lb,len(valv)))
         candidates.sort(key=lambda z:z[0],reverse=True)
         best=candidates[0]
         meanv,mode,h,lb,_=best
-        # freeze thresholds using ALL prior days, then test current day
         aa=[]; pp=[]
-        for _,ts,bid,ask in prior:
-            p,a=feat(ts,bid,ask,lb); pp.append(p); aa.append(a)
+        for d in range(oi):
+            p,a=cache[d][lb]; pp.append(p); aa.append(a)
         aq=float(np.quantile(np.concatenate(aa),.80))
         pq=float(np.quantile(np.concatenate(pp),.20)) if mode[1]=="contrarian" else float(np.quantile(np.concatenate(pp),.80))
-        item=files[oi]
-        ts,bid,ask=item[1:]
-        p,a=feat(ts,bid,ask,lb)
+        item=files[oi]; ts,bid,ask=item[1:]
+        p,a=cache[oi][lb]
         v,n=score(ts,bid,ask,p,a,pq,aq,h,mode)
         print("OOS",item[0].name,"SELECTED","lb",lb,"h",h//1000,"mode",mode[1],"activity",mode[2],
               "VAL",round(meanv,4),"N",n,"OOS",round(v,4) if np.isfinite(v) else None)
-        results.extend([v]*n if np.isfinite(v) else [])
+        if np.isfinite(v): results.extend([v]*n)
     if results:
         print("AGGREGATE_SELECTED_OOS","N",len(results),"mean",round(float(np.mean(results)),4),
               "median",round(float(np.median(results)),4),"win",round(float(np.mean(np.asarray(results)>0)),4))
