@@ -36,7 +36,7 @@ def run(ts,bid,ask,mid,ret,h,cut,lo,hi,side):
             q.append((bid[j]-ask[i])/ask[i]*1e4)
         else:
             g.append((mid[i]/mid[j]-1)*1e4)
-            q.append((ask[i]-bid[j])/bid[j]*1e4)
+            q.append((bid[i]-ask[j])/bid[i]*1e4)
         last=cur
     return np.asarray(g),np.asarray(q)
 
