@@ -20,7 +20,7 @@ def feat(ts,bid,ask,lb):
     d=np.diff(mid)
     p=np.convolve(np.sign(d),np.ones(lb)/lb,mode="valid")
     a=np.convolve(np.abs(d),np.ones(lb)/lb,mode="valid")
-    r=np.convolve(d,np.ones(lb),mode="valid")/mid[lb-1:]*1e4
+    r=np.convolve(d,np.ones(lb),mode="valid")/mid[lb:]*1e4
     return mid,p,a,r
 
 def run(ts,bid,ask,mid,p,a,r,h,cut,p_lo,a_hi,r_lo):
