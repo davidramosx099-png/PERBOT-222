@@ -11,6 +11,8 @@ def load(p):
     with Path(p).open(newline="",encoding="utf-8") as f:
         rd=csv.DictReader(f); rows=[]
         for x in rd: rows.append((int(x["timestamp"]),float(x["bidPrice"]),float(x["askPrice"])))
+    if not rows:
+        return np.empty(0,dtype=np.int64),np.empty(0),np.empty(0)
     a=np.asarray(rows,dtype=float)
     return a[:,0].astype(np.int64),a[:,1],a[:,2]
 
@@ -36,6 +38,7 @@ def main():
     for f in sorted(Path("data/multi").glob("*.csv")):
         ts,bid,ask=load(f)
         if len(ts)>=MIN_ROWS: fs.append((f,ts,bid,ask))
+        elif len(ts)==0: print("SKIP_EMPTY",f.name)
     print("VALID_DAYS",len(fs))
     allres={h:[] for h in HORIZONS}
     for cut in range(3,len(fs)):
