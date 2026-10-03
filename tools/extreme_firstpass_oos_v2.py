@@ -90,5 +90,5 @@ def main():
                   "stop",round(float(np.mean(outcomes==-1)),4),
                   "timeout",round(float(np.mean(outcomes==0)),4),
                   "realized_bps",round(float(realized.mean()),4),
-                  "median_bps",round(float(np.median(realized)),4),flush=True))
+                  "median_bps",round(float(np.median(realized)),4),flush=True)
 if __name__=="__main__": main()
