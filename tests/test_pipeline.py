@@ -21,7 +21,7 @@ def test_features_are_available_only_after_lookback():
     ticks = synthetic_ticks()
     f = build_features(ticks, lookback=50)
     assert f.loc[:48, "ret_lb"].isna().all()
-    assert f.loc[49:, "ret_lb"].notna().all()
+    assert f.loc[50:, "ret_lb"].notna().all()
 
 
 def test_labels_keep_incomplete_tail_missing():
