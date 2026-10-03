@@ -16,7 +16,12 @@ def run_grid(
     train_fraction: float = 0.70,
     threshold: float = 0.60,
 ) -> pd.DataFrame:
-    """Run a leakage-safe chronological grid over prediction hypotheses."""
+    """Run a leakage-safe chronological grid over prediction hypotheses.
+
+    Degenerate one-class training windows are retained as diagnostic rows using
+    a constant empirical-probability baseline instead of being silently
+    discarded. A fitted logistic model is used whenever both classes exist.
+    """
     rows: list[dict] = []
 
     for lookback in lookbacks:
@@ -39,11 +44,19 @@ def run_grid(
                 train, test = chronological_split(
                     frame, train_fraction=train_fraction
                 )
-                if train["y_up"].nunique() < 2 or test["y_up"].nunique() < 2:
+                if train.empty or test.empty:
                     continue
 
-                fitted = fit_logistic_baseline(train)
-                p_test = predict_probability(fitted, test)
+                if train["y_up"].nunique() >= 2:
+                    fitted = fit_logistic_baseline(train)
+                    p_test = predict_probability(fitted, test)
+                else:
+                    # Logistic regression cannot fit a single class. Preserve
+                    # the experiment with the only leakage-safe probability:
+                    # the training-set empirical positive rate.
+                    p = float(train["y_up"].mean())
+                    p_test = pd.Series(p, index=test.index, name="p_up")
+
                 metrics = classification_metrics(
                     test["y_up"], p_test, threshold=threshold
                 )
