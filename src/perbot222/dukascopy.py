@@ -5,7 +5,12 @@ import urllib.request
 from datetime import datetime, timezone, timedelta
 from .ingest import Tick, TickStore
 
-BASE = "https://datafeed.dukascopy.com/datafeed"\n\n# Direct HTTP archive access is legacy and may return 503. Current Dukascopy\n# historical export uses S3 Requester Pays; keep this module only as a decoder\n# until authenticated S3 ingestion is configured.\nXAUUSD_POINT_VALUE = None
+BASE = "https://datafeed.dukascopy.com/datafeed"
+
+# Direct HTTP archive access is legacy and may return 503. Current Dukascopy
+# historical export uses S3 Requester Pays; keep this module only as a decoder
+# until authenticated S3 ingestion is configured.
+XAUUSD_POINT_VALUE = None
 
 def decode_bi5_daily(payload: bytes, day_start_ms: int, point_value: float) -> list[Tick]:
     raw = lzma.decompress(payload)
