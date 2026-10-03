@@ -6,6 +6,7 @@ on:
       - "tools/extreme_firstpass_oos_v2.py"
       - "tools/frozen_firstpass_holdout.py"
       - "tools/frozen_rolling_holdout.py"
+      - "tools/expanded_rolling_holdout.py"
       - ".github/workflows/remote-research.yml"
   workflow_dispatch:
 
@@ -34,9 +35,9 @@ jobs:
           done
       - name: Run first-passage OOS
         run: |
-          python tools/frozen_rolling_holdout.py | tee results_frozen_rolling.txt
+          python tools/expanded_rolling_holdout.py | tee results_expanded_rolling.txt
       - name: Upload research result
         uses: actions/upload-artifact@v4
         with:
-          name: perbot222-frozen-rolling
-          path: results_frozen_rolling.txt
+          name: perbot222-expanded-rolling
+          path: results_expanded_rolling.txt
