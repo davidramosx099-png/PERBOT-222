@@ -18,7 +18,7 @@ def test_grid_runs_on_synthetic_ticks():
         ticks,
         lookbacks=(20, 50),
         horizons=(1.0, 3.0),
-        target_returns=(0.0001,),
+        target_returns=(0.0005,),
         threshold=0.55,
     )
 
