@@ -1,4 +1,5 @@
 name: PERBOT-222 full research pipeline
+# Triggered after validated test fixes; research remains independent from unit-test workflow.
 
 on:
   push:
