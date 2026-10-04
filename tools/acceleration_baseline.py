@@ -13,7 +13,8 @@ def load(path):
 def main():
     ts,bid,ask=load("data/xau_test/xauusd-tick-2026-09-29-2026-09-30.csv")
     cut=int(len(ts)*.7)
-    spread_med=np.median(ask[:cut]-bid[:cut])\n print("TRAIN 70%; quote-aware BUY return; signed pressure + acceleration")
+    spread_med=np.median(ask[:cut]-bid[:cut])
+    print("TRAIN 70%; quote-aware BUY return; signed pressure + acceleration")
     for lb in (50,100,250,500,1000,2000):
         d=np.diff((bid+ask)/2)
         s=np.sign(d)
