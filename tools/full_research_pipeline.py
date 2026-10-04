@@ -18,6 +18,7 @@ SCRIPTS=[
 "tools/arrival_rate_oos.py",
 "tools/arrival_direction_oos.py",
 "tools/extreme_arrival_direction_oos.py",
+"tools/short_extreme_arrival_oos.py",
 "tools/extreme_mfe_oos.py",
 "tools/extreme_firstpass_oos_v2.py",
 "tools/frozen_firstpass_holdout.py",
