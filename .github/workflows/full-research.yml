@@ -5,6 +5,7 @@ on:
   push:
     paths:
       - "tools/full_research_pipeline.py"
+      - "tools/*.py"
       - ".github/workflows/full-research.yml"
   workflow_dispatch:
 
@@ -27,10 +28,14 @@ jobs:
           npm install -g dukascopy-node
       - name: Download research data
         run: |
-          mkdir -p data/multi
-          for d in 2026-09-07 2026-09-08 2026-09-09 2026-09-10 2026-09-11 2026-09-13 2026-09-14 2026-09-15 2026-09-16 2026-09-20 2026-09-21 2026-09-22 2026-09-23 2026-09-24 2026-09-25; do
+          mkdir -p data/multi data/xau_test
+          for d in 2026-09-07 2026-09-08 2026-09-09 2026-09-10 2026-09-11 2026-09-13 2026-09-14 2026-09-15 2026-09-16 2026-09-20 2026-09-21 2026-09-22 2026-09-23 2026-09-24 2026-09-25 2026-09-29; do
             npx dukascopy-node -i xauusd -from "$d" -to "$(date -u -d "$d + 1 day" +%Y-%m-%d)" -t tick -f csv -dir data/multi || true
           done
+          src="$(find data/multi -type f \( -iname '*2026-09-29*' -o -iname '*2026_09_29*' \) | head -n 1)"
+          test -n "$src"
+          cp "$src" data/xau_test/xauusd-tick-2026-09-29-2026-09-30.csv
+          test -s data/xau_test/xauusd-tick-2026-09-29-2026-09-30.csv
       - name: Unit tests
         run: pytest -q
       - name: Run complete research pipeline
