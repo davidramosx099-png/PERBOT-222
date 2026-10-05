@@ -3,7 +3,7 @@ import numpy as np
 from pathlib import Path
 
 LB=(250,500,1000,2000); H=(30_000,60_000)
-Q_RATE=(0.80,0.90,0.95); Q_PRESS=(0.80,0.85,0.90,0.95)
+Q_RATE=(0.80,0.90,0.95); Q_PRESS=(0.05,0.10,0.15,0.20)
 MIN_ROWS=100_000; COOLDOWN=60_000
 
 def load(p):
@@ -22,7 +22,7 @@ def feat(ts,bid,ask,lb):
 def run(ts,bid,ask,mid,rate,pressure,h,lb,rc,pc):
     gross=[]; quote=[]; last=None
     for k in range(len(rate)):
-        if rate[k]<rc or pressure[k]<pc: continue
+        if rate[k]<rc or pressure[k]>pc: continue
         i=k+lb; cur=int(ts[i])
         if last is not None and cur-last<COOLDOWN: continue
         j=np.searchsorted(ts,cur+h)
@@ -38,7 +38,7 @@ def main():
         x=load(f)
         if x is not None and len(x[0])>=MIN_ROWS: fs.append((f,*x))
     print("VALID_DAYS",len(fs))
-    print("PROTOCOL prior-3-days thresholds | high arrival + extreme positive pressure | quote-aware SELL")
+    print("PROTOCOL prior-3-days thresholds | high arrival + extreme negative pressure | quote-aware SELL")
     for lb in LB:
         for h in H:
             for rq in Q_RATE:
